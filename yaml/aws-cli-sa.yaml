@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aws-cli-sa
+  namespace: default
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::535915401024:role/EKS-AWS-CLI-S3-Role"
