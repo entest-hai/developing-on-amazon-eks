@@ -1,0 +1,137 @@
+AWSTemplateFormatVersion: "2010-09-09"
+#------------------------------------------------------
+# Parameters
+#------------------------------------------------------
+Parameters:
+  NetworkStackName:
+    Type: String
+    Default: "eks-network-stack"
+  EKSClusterVersion:
+    Type: String
+    Default: "1.30"
+  NodeGroupInstanceType:
+    Type: String
+    Default: "t3.medium"
+#------------------------------------------------------
+# Resources: EKS Cluster
+#------------------------------------------------------
+Resources:
+  EKSClusterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - eks.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonEKSClusterPolicy
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonEKSVPCResourceController
+
+  ControlPlane:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: !Sub ${AWS::StackName}-eks-cluster
+      ResourcesVpcConfig:
+        # NOTE: EndpointPublicAccess is set to true for demonstration purposes only.
+        # In a production environment, consider using private endpoints with proper security controls.
+        EndpointPublicAccess: true
+        SecurityGroupIds:
+          - !ImportValue
+            Fn::Sub: ${NetworkStackName}-eks-cluster-sg
+        SubnetIds:
+          - !ImportValue
+            Fn::Sub: ${NetworkStackName}-public-subnet-1
+          - !ImportValue
+            Fn::Sub: ${NetworkStackName}-public-subnet-2
+          - !ImportValue
+            Fn::Sub: ${NetworkStackName}-public-subnet-3
+      Version: !Ref EKSClusterVersion
+      RoleArn: !GetAtt EKSClusterRole.Arn
+
+  ManagedNodeGroupRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonEKS_CNI_Policy
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  ManagedNodeGroup:
+    Type: AWS::EKS::Nodegroup
+    Properties:
+      AmiType: AL2_x86_64
+      ClusterName: !Ref ControlPlane
+      InstanceTypes:
+        - !Ref NodeGroupInstanceType
+      Labels:
+        alpha.eksctl.io/cluster-name: !Ref ControlPlane
+      NodeRole: !GetAtt ManagedNodeGroupRole.Arn
+      ScalingConfig:
+        DesiredSize: 3
+        MaxSize: 3
+        MinSize: 3
+      Subnets:
+        - !ImportValue
+          Fn::Sub: ${NetworkStackName}-public-subnet-1
+        - !ImportValue
+          Fn::Sub: ${NetworkStackName}-public-subnet-2
+        - !ImportValue
+          Fn::Sub: ${NetworkStackName}-public-subnet-3
+      Tags:
+        Name: !Sub ${AWS::StackName}-eks-nodegroup
+
+#------------------------------------------------------
+# Exported Outputs
+#------------------------------------------------------
+Outputs:
+  EKSClusterName:
+    Description: EKS Cluster Name
+    Value: !Ref ControlPlane
+    Export:
+      Name: !Sub ${AWS::StackName}-eks-cluster-name
+  EKSClusterArn:
+    Description: EKS Cluster Arn
+    Value: !GetAtt ControlPlane.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-eks-cluster-arn
+  EKSClusterEndpoint:
+    Description: EKS Cluster Endpoint
+    Value: !GetAtt ControlPlane.Endpoint
+    Export:
+      Name: !Sub ${AWS::StackName}-eks-cluster-endpoint
+  EKSClusterVersion:
+    Description: EKS Cluster Version
+    Value: !Ref EKSClusterVersion
+    Export:
+      Name: !Sub ${AWS::StackName}-eks-cluster-version
+  EKSNodegroupName:
+    Description: EKS Nodegroup Name
+    Value: !Ref ManagedNodeGroup
+    Export:
+      Name: !Sub ${AWS::StackName}-eks-nodegroup-name
+  EksClusterOIDCUrl:
+    Description: EKS Cluster OIDC Url
+    Value: !GetAtt ControlPlane.OpenIdConnectIssuerUrl
+    Export:
+      Name: !Sub ${AWS::StackName}-eks-cluster-oidc-url
+  EksClusterOID:
+    Description: EKS Cluster OIDC ID
+    Value:
+      !Select [1, !Split ["//", !GetAtt ControlPlane.OpenIdConnectIssuerUrl]]
+    Export:
+      Name: !Sub ${AWS::StackName}-eks-cluster-oidc-id

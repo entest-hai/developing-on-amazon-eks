@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  EksStackName:
+    Type: String
+    Default: eks-stack-eks-cluster
+Resources:
+  EksOIDCProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: !ImportValue
+        Fn::Sub: ${EksStackName}-oidc-url
+      ClientIdList:
+        - sts.amazonaws.com
+      ThumbprintList:
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+  # Role for eks csi driver add-on
+  EksCsiDriverRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: eks-csi-driver-role
+      AssumeRolePolicyDocument: !Sub
+        - |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Federated": "arn:${PARTITION}:iam::${ACCOUNT_ID}:oidc-provider/${OIDC}"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                  "StringEquals": {
+                    "${OIDC}:aud": "sts.amazonaws.com",
+                    "${OIDC}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+                  }
+                }
+              }
+            ]
+          }
+        - PARTITION: !Ref AWS::Partition
+          ACCOUNT_ID: !Ref AWS::AccountId
+          OIDC: !ImportValue
+            Fn::Sub: ${EksStackName}-oidc-id
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonEKS_CNI_Policy
+  # Role for eks container insight add-on
+  EksContainerInsightRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: eks-container-insight-role
+      AssumeRolePolicyDocument: !Sub
+        - |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Federated": "arn:${PARTITION}:iam::${ACCOUNT_ID}:oidc-provider/${OIDC}"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                  "StringEquals": {
+                    "${OIDC}:aud": "sts.amazonaws.com",
+                    "${OIDC}:sub": "system:serviceaccount:amazon-cloudwatch:cloudwatch-agent"
+                  }
+                }
+              }
+            ]
+          }
+        - PARTITION: !Ref AWS::Partition
+          ACCOUNT_ID: !Ref AWS::AccountId
+          OIDC: !ImportValue
+            Fn::Sub: ${EksStackName}-oidc-id
+            # Fn::ImportValue: !Sub ${EksStackName}-oidc-id
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy

@@ -1,0 +1,39 @@
+# Ignore tar.gz files
+*.tar.gz
+
+# Ignore sha256 files
+*.sha256
+
+# Ignore credentials and config files
+**/credentials
+**/config
+**/.aws/
+**/.kube/
+**/.config/
+
+# Ignore other common files
+.DS_Store
+.env
+.env.*
+*.log
+node_modules/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
