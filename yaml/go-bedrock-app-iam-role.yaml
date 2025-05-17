@@ -1,0 +1,29 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: eks-stack-eks-cluster
+  region: us-west-2
+iam:
+  serviceAccounts:
+  - metadata:
+      name: go-bedrock-service-account
+      namespace: default
+    attachPolicyARNs: []
+    wellKnownPolicies:
+      autoScaler: false
+    roleName: go-bedrock-app-role
+    roleOnly: false
+    attachPolicy:
+      Version: "2012-10-17"
+      Statement:
+      - Effect: Allow
+        Action:
+        - "bedrock:InvokeModel"
+        - "bedrock:InvokeModelWithResponseStream"
+        Resource:
+        - "arn:aws:bedrock:us-west-2::foundation-model/*"
+      - Effect: Allow
+        Action:
+        - "bedrock:ListFoundationModels"
+        - "bedrock:GetFoundationModel"
+        Resource: "*"

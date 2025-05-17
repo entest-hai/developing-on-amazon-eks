@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-bedrock-service
+  namespace: default
+  annotations:
+    # Use AWS Load Balancer Controller
+    service.beta.kubernetes.io/aws-load-balancer-type: "external"
+    # Use NLB (Network Load Balancer)
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+    # Internet facing
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    # Use TCP protocol
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+    # Enable cross-zone load balancing
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    # Health check configuration
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-port: "3000"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: "/"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-interval: "15"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-timeout: "5"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-healthy-threshold: "2"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-unhealthy-threshold: "2"
+spec:
+  selector:
+    app: go-bedrock-app
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+  type: LoadBalancer
