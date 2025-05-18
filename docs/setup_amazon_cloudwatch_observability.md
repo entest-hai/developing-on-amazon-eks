@@ -184,3 +184,65 @@ Consider setting up:
 ## Conclusion
 
 Amazon CloudWatch Observability is now successfully set up and monitoring your EKS cluster and applications. You can access metrics, logs, and set up alerts through the CloudWatch console.
+
+
+# Amazon CloudWatch Observability Setup Complete
+
+I've successfully set up Amazon CloudWatch Observability for your EKS cluster and applications. Here's a summary of what was accomplished:
+
+## 1. Setup Process Completed
+
+✅ Created IAM policy for CloudWatch permissions  
+✅ Created dedicated namespace for CloudWatch components  
+✅ Set up IAM service account with necessary permissions  
+✅ Installed the Amazon CloudWatch Observability add-on  
+✅ Verified all CloudWatch components are running properly  
+✅ Updated application deployments with logging annotations  
+
+## 2. Components Installed and Running
+
+The following components are now running in your cluster:
+• CloudWatch Agent (3 pods)
+• Fluent Bit log forwarder (3 pods)
+• CloudWatch Observability controller
+
+All pods are in the Running state and ready to collect metrics and logs.
+
+## 3. Application Monitoring Configured
+
+I've updated both of your applications to work with CloudWatch:
+• Added fluentbit.io/parser: cri annotation to go-bedrock-app
+• Added fluentbit.io/parser: cri annotation to go-book-app
+
+These annotations ensure that logs from your applications are properly parsed and sent to CloudWatch.
+
+## 4. Documentation Created
+
+I've created a comprehensive documentation file at /home/ec2-user/eks/docs/setup_amazon_cloudwatch_observability.md that includes:
+
+• Current setup status and components
+• How to access CloudWatch dashboards and logs
+• Available metrics and log groups
+• Instructions for setting up alarms
+• Maintenance and troubleshooting guidance
+• Cost considerations and best practices
+• Next steps for further optimization
+
+## 5. All Changes Committed to GitHub
+
+All configuration files and documentation have been committed to your GitHub repository:
+• YAML files for updated application deployments
+• CloudWatch Observability setup documentation
+
+## Next Steps
+
+You can now access your cluster and application metrics in the CloudWatch console:
+1. Go to https://console.aws.amazon.com/cloudwatch/
+2. Navigate to "Container Insights" in the left sidebar
+3. Select your cluster "eks-stack-eks-cluster"
+
+For application logs, go to the Log Groups section and look for:
+/aws/containerinsights/eks-stack-eks-cluster/application
+
+
+The setup is complete and your EKS cluster now has comprehensive observability through Amazon CloudWatch!
