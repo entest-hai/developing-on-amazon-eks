@@ -1,169 +1,212 @@
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width" />
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude 3 Haiku Chat (Streaming API)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      :root {
-        box-sizing: border-box;
-      }
-      *,
-      ::before,
-      ::after {
-        box-sizing: inherit;
-      }
-
-      body {
-        /* background-color: antiquewhite; */
-      }
-
-      .container {
-        width: 100%;
-        max-width: 500px;
-        margin: auto;
-        /* background-color: antiquewhite; */
-      }
-
-      .button {
-        background-color: #43a047;
-        padding: 8px 20px;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
-        position: absolute;
-        transform: translateY(-50%);
-        top: 50%;
-        right: 10px;
-        opacity: 0.8;
-      }
-
-      .button:hover {
-        background-color: orange;
-      }
-
-      .text-input {
-        padding: 10px 15px;
-        width: 100%;
-        outline: none;
-        border: solid black 1px;
-        background-color: #e0e0e0;
-        box-shadow: 0 10px 15px -3px #e0e0e0;
-
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-          sans-serif;
-        font-size: medium;
-        font-weight: 400;
-        letter-spacing: normal;
-        line-height: 25px;
-      }
-
-      .text-input:focus {
-        border: solid #4caf50 1.5px;
-        outline: none;
-      }
-
-      .container-input {
-        position: relative;
-      }
-
-      .form {
-        margin-top: 20px;
-      }
-
-      .text-model {
-        /* color: #4caf50; */
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-          sans-serif;
-        font-size: medium;
-        font-weight: 400;
-        letter-spacing: normal;
-        line-height: 25px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <form id="form" onkeydown="return event.key != 'Enter';" class="form">
-        <div class="container-input">
-          <input class="text-input" type="text" id="text-input" />
-          <button id="submit" class="button">Ask</button>
-        </div>
-      </form>
-      <div>
-        <p id="model-answer" class="text-model"></p>
-      </div>
-    </div>
-    <script>
-      // conversation turns
-      let messages = [];
-
-      // get html component for model answer
-      const modelAnswer = document.getElementById("model-answer");
-
-      const callBedrockStream = async () => {
-        // present model answer to frontend
-        modelAnswer.innerText = "";
-
-        // get user question
-        const userQuestion = document.getElementById("text-input").value;
-
-        // push user question to messages
-        messages.push({
-          role: "user",
-          content: [{ type: "text", text: userQuestion }],
-        });
-
-        if (userQuestion) {
-          try {
-            const response = await fetch("/bedrock-haiku", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ messages: messages }),
-            });
-
-            console.log(response);
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) {
-                break;
-              }
-              const text = decoder.decode(value);
-              console.log(text);
-              modelAnswer.innerText += text;
-            }
-
-            // push model answer to converstion turn
-            messages.push({
-              role: "assistant",
-              content: [{ type: "text", text: modelAnswer.innerText }],
-            });
-          } catch (error) {
-            console.log(error);
-          }
-        } else {
-          console.log("Please enter question ...");
+        .chat-container {
+            height: calc(100vh - 200px);
+            overflow-y: auto;
         }
-      };
 
-      document
-        .getElementById("submit")
-        .addEventListener("click", async (event) => {
-          event.preventDefault();
-          await callBedrockStream();
+        .user-message {
+            background-color: #e2f5e2;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px 0;
+            max-width: 80%;
+            align-self: flex-end;
+        }
+
+        .assistant-message {
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px 0;
+            max-width: 80%;
+            align-self: flex-start;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            border-top-color: #000;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">Claude 3 Haiku Chat (Streaming API)</h1>
+        <div class="bg-white rounded-lg shadow-md p-4">
+            <div id="chat" class="chat-container flex flex-col">
+                <div class="assistant-message">
+                    Hello! I'm Claude 3 Haiku. How can I help you today?
+                </div>
+            </div>
+            <div class="mt-4 flex">
+                <input id="userInput" type="text" placeholder="Type your message..."
+                    class="flex-grow border rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button id="sendButton" onclick="sendMessage()"
+                    class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Send
+                </button>
+            </div>
+            <div class="mt-2 text-sm text-gray-500">
+                <span id="status"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chat = document.getElementById('chat');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const statusDisplay = document.getElementById('status');
+        let messages = [
+            {
+                role: "assistant",
+                content: [
+                    {
+                        type: "text",
+                        text: "Hello! I'm Claude 3 Haiku. How can I help you today?"
+                    }
+                ]
+            }
+        ];
+
+        userInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
         });
 
-      document
-        .getElementById("text-input")
-        .addEventListener("keydown", async (event) => {
-          if (event.code === "Enter") {
-            await callBedrockStream();
-          }
-        });
+        async function sendMessage() {
+            const userMessage = userInput.value.trim();
+            if (!userMessage) return;
+
+            // Clear input
+            userInput.value = '';
+
+            // Add user message to chat
+            const userDiv = document.createElement('div');
+            userDiv.className = 'user-message';
+            userDiv.textContent = userMessage;
+            chat.appendChild(userDiv);
+
+            // Add user message to messages array
+            messages.push({
+                role: "user",
+                content: [
+                    {
+                        type: "text",
+                        text: userMessage
+                    }
+                ]
+            });
+
+            // Show loading indicator
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'assistant-message flex items-center';
+            loadingDiv.innerHTML = '<div class="loading mr-2"></div> Thinking...';
+            chat.appendChild(loadingDiv);
+
+            // Scroll to bottom
+            chat.scrollTop = chat.scrollHeight;
+
+            try {
+                statusDisplay.textContent = "Connecting to Claude...";
+                const startTime = Date.now();
+                
+                // Create assistant response div
+                const assistantDiv = document.createElement('div');
+                assistantDiv.className = 'assistant-message';
+                
+                // Start streaming request
+                const response = await fetch('/bedrock-haiku', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ messages: messages })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Remove loading indicator
+                chat.removeChild(loadingDiv);
+                
+                // Add the empty assistant message div to the chat
+                chat.appendChild(assistantDiv);
+                
+                // Process the streaming response
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let responseText = '';
+
+                statusDisplay.textContent = "Receiving response...";
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value);
+                    responseText += chunk;
+                    assistantDiv.textContent = responseText;
+                    
+                    // Scroll to bottom as content arrives
+                    chat.scrollTop = chat.scrollHeight;
+                }
+
+                // Calculate and display response time
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                statusDisplay.textContent = `Response completed in ${responseTime}ms`;
+
+                // Add assistant message to messages array
+                messages.push({
+                    role: "assistant",
+                    content: [
+                        {
+                            type: "text",
+                            text: responseText
+                        }
+                    ]
+                });
+
+                // Final scroll to bottom
+                chat.scrollTop = chat.scrollHeight;
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Remove loading indicator
+                chat.removeChild(loadingDiv);
+                
+                // Show error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'assistant-message text-red-500';
+                errorDiv.textContent = 'Sorry, there was an error processing your request.';
+                chat.appendChild(errorDiv);
+                
+                statusDisplay.textContent = "Error: Failed to get response from Claude";
+            }
+        }
     </script>
-  </body>
+</body>
+
 </html>
