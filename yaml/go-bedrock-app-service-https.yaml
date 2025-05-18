@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-bedrock-service
+  namespace: default
+  annotations:
+    # Use AWS Load Balancer Controller
+    service.beta.kubernetes.io/aws-load-balancer-type: "external"
+    # Use NLB (Network Load Balancer)
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+    # Internet facing
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    # Use TLS protocol
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+    # Enable cross-zone load balancing
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    # Health check configuration
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-port: "3000"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: "/"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-interval: "15"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-timeout: "5"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-healthy-threshold: "2"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-unhealthy-threshold: "2"
+    # SSL certificate configuration
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-west-2:535915401024:certificate/eb302b0a-8690-47ad-8605-7a9d59e4f656"
+    # SSL ports
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    # Custom domain name
+    external-dns.alpha.kubernetes.io/hostname: "eks-bedrock.entest.io"
+spec:
+  selector:
+    app: go-bedrock-app
+  ports:
+  - name: https
+    port: 443
+    targetPort: 3000
+    protocol: TCP
+  type: LoadBalancer
