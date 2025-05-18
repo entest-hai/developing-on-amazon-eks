@@ -98,6 +98,22 @@ func main() {
 		}
 	})
 
+	// frontend claude haiku converse
+	mux.HandleFunc("/converse", func(w http.ResponseWriter, r *http.Request) {
+		content, error := os.ReadFile("./static/claude-haiku-converse.html")
+		if error != nil {
+			fmt.Println(error)
+		}
+		w.Write(content)
+	})
+
+	// backend claude haiku converse
+	mux.HandleFunc("/bedrock-haiku-converse", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "POST" {
+			gobedrock.HandleBedrockClaude3HaikuChatConverse(w, r, BedrockClient)
+		}
+	})
+
 	// bedrock frontend for image analyzer
 	mux.HandleFunc("/image", func(w http.ResponseWriter, r *http.Request) {
 		content, error := os.ReadFile("./static/image.html")
