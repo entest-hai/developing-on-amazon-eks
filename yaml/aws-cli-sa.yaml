@@ -4,4 +4,5 @@ metadata:
   name: aws-cli-sa
   namespace: default
   annotations:
+    # REPLACE: Update with your actual AWS account ID in the role ARN
     eks.amazonaws.com/role-arn: "arn:aws:iam::your-account-id:role/EKS-AWS-CLI-S3-Role"
