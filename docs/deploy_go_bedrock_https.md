@@ -159,6 +159,52 @@ curl -v https://your-domain.example.com
 
 You should see that the connection is secure and the certificate is valid.
 
+### Testing with the NLB Endpoint Directly
+
+If you need to test the HTTPS configuration before DNS propagation or to troubleshoot issues, you can access the NLB endpoint directly:
+
+```bash
+# Using the -k flag to skip certificate validation
+curl -v -k https://k8s-default-gobedroc-29ca929843-a6e0fe1b6942ceef.elb.us-west-2.amazonaws.com
+```
+
+The `-k` flag is necessary because:
+1. The certificate is issued for your custom domain (e.g., eks-bedrock.entest.io)
+2. You're accessing the load balancer using its AWS-assigned DNS name
+3. This causes a certificate name mismatch error without the `-k` flag
+
+Note that this approach is only for testing and troubleshooting. In production, users should access your application through the custom domain name.
+
+### Testing HTTP Traffic
+
+If you need to test the application without HTTPS, you can create a separate ClusterIP service that exposes the application internally, then use port-forwarding:
+
+```bash
+# Create an internal service
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-bedrock-internal
+  namespace: default
+spec:
+  selector:
+    app: go-bedrock-app
+  ports:
+  - port: 3000
+    targetPort: 3000
+  type: ClusterIP
+EOF
+
+# Set up port forwarding
+kubectl port-forward svc/go-bedrock-internal 3000:3000
+```
+
+Then in another terminal:
+```bash
+curl http://localhost:3000
+```
+
 ## Troubleshooting
 
 ### Certificate Issues
