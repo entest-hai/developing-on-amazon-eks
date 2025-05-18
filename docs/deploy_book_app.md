@@ -39,7 +39,8 @@ spec:
     spec:
       containers:
       - name: go-book-app
-        image: 535915401024.dkr.ecr.us-west-2.amazonaws.com/go-book-app:latest
+        # REPLACE: Update with your actual AWS account ID in the image URL
+        image: your-account-id.dkr.ecr.us-west-2.amazonaws.com/go-book-app:latest
         ports:
         - containerPort: 3000
           name: http
@@ -153,7 +154,7 @@ kubectl get service go-book-app-service
 Expected output:
 ```
 NAME                  TYPE           CLUSTER-IP       EXTERNAL-IP                                                              PORT(S)        AGE
-go-book-app-service   LoadBalancer   172.20.123.100   a823e0da9bb864ecf847884d95f8a65a-150988925.us-west-2.elb.amazonaws.com   80:32306/TCP   <age>
+go-book-app-service   LoadBalancer   172.20.123.100   your-load-balancer-id.region.elb.amazonaws.com                           80:32306/TCP   <age>
 ```
 
 ## Accessing the Application
@@ -161,7 +162,7 @@ go-book-app-service   LoadBalancer   172.20.123.100   a823e0da9bb864ecf847884d95
 Once the LoadBalancer is provisioned (which may take a few minutes), you can access the application using the EXTERNAL-IP:
 
 ```
-http://a823e0da9bb864ecf847884d95f8a65a-150988925.us-west-2.elb.amazonaws.com
+http://your-load-balancer-id.region.elb.amazonaws.com
 ```
 
 ## AWS Load Balancer Details

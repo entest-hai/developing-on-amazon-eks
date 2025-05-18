@@ -76,7 +76,7 @@ kubectl get service go-book-app-nlb
 Expected output:
 ```
 NAME             TYPE           CLUSTER-IP       EXTERNAL-IP                                                                    PORT(S)        AGE
-go-book-app-nlb  LoadBalancer   172.20.128.252   k8s-default-gobookap-60b64009f1-57901afec9b43a8d.elb.us-west-2.amazonaws.com   80:32683/TCP   <age>
+go-book-app-nlb  LoadBalancer   172.20.128.252   k8s-default-gobookap-xxxxxxxx-xxxxxxxxxxxxxxxx.elb.region.amazonaws.com        80:32683/TCP   <age>
 ```
 
 ## Target Types: IP vs Instance
@@ -148,6 +148,7 @@ If your application doesn't respond properly to the health check path:
 To check the health of your NLB targets:
 
 ```bash
+# REPLACE: Update 'gobookap' with your actual target group name prefix if different
 aws elbv2 describe-target-health --target-group-arn $(aws elbv2 describe-target-groups --query "TargetGroups[?contains(TargetGroupName, 'gobookap')].TargetGroupArn" --output text)
 ```
 
