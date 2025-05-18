@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: go-book-app
-        image: 535915401024.dkr.ecr.us-west-2.amazonaws.com/go-book-app:latest
+        image: your-account-id.dkr.ecr.us-west-2.amazonaws.com/go-book-app:latest
         ports:
         - containerPort: 3000
           name: http

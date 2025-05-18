@@ -23,11 +23,11 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-healthcheck-healthy-threshold: "2"
     service.beta.kubernetes.io/aws-load-balancer-healthcheck-unhealthy-threshold: "2"
     # SSL certificate configuration
-    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-west-2:535915401024:certificate/eb302b0a-8690-47ad-8605-7a9d59e4f656"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-west-2:your-account-id:certificate/certificate-id"
     # SSL ports
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
     # Custom domain name
-    external-dns.alpha.kubernetes.io/hostname: "eks-bedrock.entest.io"
+    external-dns.alpha.kubernetes.io/hostname: "your-domain.example.com"
 spec:
   selector:
     app: go-bedrock-app
