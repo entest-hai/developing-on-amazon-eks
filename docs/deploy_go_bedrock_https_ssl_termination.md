@@ -108,3 +108,29 @@ To monitor the SSL/TLS termination:
    ```
 
 By understanding these aspects of HTTPS with Network Load Balancers, you can make informed decisions about your security architecture and troubleshoot any SSL/TLS-related issues effectively.
+
+## Confirmation of SSL Termination at NLB
+
+To confirm that SSL/HTTPS is indeed terminated by the Network Load Balancer (NLB) in this configuration:
+
+1. The annotations in the service manifest explicitly configure SSL termination at the NLB:
+   ```yaml
+   service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:region:account-id:certificate/certificate-id"
+   service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+   ```
+
+2. The traffic flow confirms this pattern:
+   ```
+   Client → HTTPS (443) → NLB (SSL termination) → TCP (3000) → EKS Pods
+   ```
+
+3. The application pods receive regular HTTP traffic on port 3000, not HTTPS traffic, indicating that the SSL termination happens before the traffic reaches the pods.
+
+4. The AWS Load Balancer Controller configures the NLB with the specified ACM certificate, which is only possible if the NLB is handling the SSL termination.
+
+This SSL termination at the NLB is a feature that AWS introduced specifically for Network Load Balancers to provide the performance benefits of NLBs while still supporting secure HTTPS connections.
+
+## References
+
+For more information about TLS termination for Network Load Balancers, see the official AWS announcement:
+[New – TLS Termination for Network Load Balancers](https://aws.amazon.com/blogs/aws/new-tls-termination-for-network-load-balancers/)
