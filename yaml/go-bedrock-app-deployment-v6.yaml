@@ -20,7 +20,8 @@ spec:
       serviceAccountName: go-bedrock-service-account
       containers:
       - name: go-bedrock-app
-        image: 535915401024.dkr.ecr.us-west-2.amazonaws.com/go-bedrock-app:v6
+        # REPLACE: Update with your actual AWS account ID in the image URL
+        image: your-account-id.dkr.ecr.us-west-2.amazonaws.com/go-bedrock-app:v6
         ports:
         - containerPort: 3000
           name: http

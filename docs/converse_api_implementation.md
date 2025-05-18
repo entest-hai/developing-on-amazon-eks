@@ -110,7 +110,8 @@ mux.HandleFunc("/bedrock-haiku-converse", func(w http.ResponseWriter, r *http.Re
        spec:
          containers:
          - name: go-bedrock-app
-           image: 535915401024.dkr.ecr.us-west-2.amazonaws.com/go-bedrock-app:v5
+           # REPLACE: Update with your actual AWS account ID in the image URL
+           image: your-account-id.dkr.ecr.us-west-2.amazonaws.com/go-bedrock-app:v5
            # ...
    ```
 
@@ -144,8 +145,8 @@ fields @timestamp, @message
 ## Accessing the Application
 
 The application is now accessible at:
-- Main URL: https://k8s-default-gobedroc-29ca929843-a6e0fe1b6942ceef.elb.us-west-2.amazonaws.com
-- Converse endpoint: https://k8s-default-gobedroc-29ca929843-a6e0fe1b6942ceef.elb.us-west-2.amazonaws.com/converse
+- Main URL: https://your-load-balancer-id.region.elb.amazonaws.com
+- Converse endpoint: https://your-load-balancer-id.region.elb.amazonaws.com/converse
 
 ## Next Steps
 

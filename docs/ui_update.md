@@ -163,7 +163,8 @@ async function sendMessage() {
        spec:
          containers:
          - name: go-bedrock-app
-           image: 535915401024.dkr.ecr.us-west-2.amazonaws.com/go-bedrock-app:v6
+           # REPLACE: Update with your actual AWS account ID in the image URL
+           image: your-account-id.dkr.ecr.us-west-2.amazonaws.com/go-bedrock-app:v6
            # ...
    ```
 
@@ -191,7 +192,7 @@ async function sendMessage() {
 ## Accessing the Application
 
 The application with the updated UI is now accessible at:
-- Main URL: https://k8s-default-gobedroc-29ca929843-a6e0fe1b6942ceef.elb.us-west-2.amazonaws.com
-- Converse endpoint: https://k8s-default-gobedroc-29ca929843-a6e0fe1b6942ceef.elb.us-west-2.amazonaws.com/converse
+- Main URL: https://your-load-balancer-id.region.elb.amazonaws.com
+- Converse endpoint: https://your-load-balancer-id.region.elb.amazonaws.com/converse
 
 Both endpoints now have a consistent, modern UI while maintaining their respective functionality (streaming vs. non-streaming API).
