@@ -42,6 +42,16 @@ This document provides detailed step-by-step instructions for querying logs for 
 2. Set the appropriate time range using the time selector in the upper right
 
 ### Step 3: Write a Basic Query for Applications
+
+```
+fields @timestamp, @message
+| filter kubernetes.pod_name like /go-bedrock-app/ and log like /Latency/
+| parse log "Latency: *ms" as latency
+| sort @timestamp desc
+| limit 100
+```
+
+
 1. In the query editor, replace any existing content with:
    ```
    fields @timestamp, @message
