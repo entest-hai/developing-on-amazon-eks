@@ -1,3 +1,9 @@
+<!-- IMPORTANT: This document contains placeholder values that need to be replaced with actual values before use:
+- YOUR_ACCOUNT_ID: Replace with your AWS account ID
+- YOUR_CERTIFICATE_ID: Replace with your ACM certificate ID
+- YOUR_OIDC_ID: Replace with your EKS OIDC provider ID
+-->
+
 # Deploying AWS CLI Pod with IAM Role in EKS
 
 This document explains how to deploy an AWS CLI container as a pod in an EKS cluster with appropriate IAM permissions using IAM Roles for Service Accounts (IRSA).

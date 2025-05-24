@@ -1,3 +1,9 @@
+<!-- IMPORTANT: This document contains placeholder values that need to be replaced with actual values before use:
+- YOUR_ACCOUNT_ID: Replace with your AWS account ID
+- YOUR_CERTIFICATE_ID: Replace with your ACM certificate ID
+- YOUR_OIDC_ID: Replace with your EKS OIDC provider ID
+-->
+
 # EKS Application Development Project Summary
 
 This document provides a summary of the enhancements and features implemented in the EKS application development project.

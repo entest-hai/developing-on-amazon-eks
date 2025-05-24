@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-book-app
+  namespace: default
+  labels:
+    app: go-book-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-book-app
+  template:
+    metadata:
+      labels:
+        app: go-book-app
+    spec:
+      containers:
+        - name: go-book-app
+          # REPLACE: Update with your actual AWS account ID in the image URL
+          image: YOUR_ACCOUNT_ID.dkr.ecr.us-west-2.amazonaws.com/go-book-app:latest
+          ports:
+            - containerPort: 3000
+              name: http
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10

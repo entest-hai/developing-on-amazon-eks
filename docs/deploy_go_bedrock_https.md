@@ -1,3 +1,9 @@
+<!-- IMPORTANT: This document contains placeholder values that need to be replaced with actual values before use:
+- YOUR_ACCOUNT_ID: Replace with your AWS account ID
+- YOUR_CERTIFICATE_ID: Replace with your ACM certificate ID
+- YOUR_OIDC_ID: Replace with your EKS OIDC provider ID
+-->
+
 # Deploying Go Bedrock Application with HTTPS
 
 This document provides instructions for configuring the Go Bedrock application to use HTTPS with a custom domain and AWS Certificate Manager (ACM) certificate.

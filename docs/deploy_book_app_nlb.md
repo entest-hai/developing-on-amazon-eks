@@ -1,3 +1,9 @@
+<!-- IMPORTANT: This document contains placeholder values that need to be replaced with actual values before use:
+- YOUR_ACCOUNT_ID: Replace with your AWS account ID
+- YOUR_CERTIFICATE_ID: Replace with your ACM certificate ID
+- YOUR_OIDC_ID: Replace with your EKS OIDC provider ID
+-->
+
 # Using AWS Network Load Balancer (NLB) with EKS
 
 This document provides guidance on using AWS Network Load Balancer (NLB) with Amazon EKS to expose your applications, with a focus on the Go Book application.

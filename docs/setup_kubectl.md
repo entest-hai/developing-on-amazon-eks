@@ -1,3 +1,9 @@
+<!-- IMPORTANT: This document contains placeholder values that need to be replaced with actual values before use:
+- YOUR_ACCOUNT_ID: Replace with your AWS account ID
+- YOUR_CERTIFICATE_ID: Replace with your ACM certificate ID
+- YOUR_OIDC_ID: Replace with your EKS OIDC provider ID
+-->
+
 # Setting up kubectl on Amazon Linux 2023
 
 This guide provides step-by-step instructions for installing and configuring kubectl on an Amazon Linux 2023 EC2 instance to interact with your EKS cluster.

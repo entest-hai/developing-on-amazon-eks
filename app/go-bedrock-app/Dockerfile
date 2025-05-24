@@ -4,7 +4,7 @@
 FROM golang:1.21.5 AS build-stage
 
 # Update packages and specifically update OpenSSL to address CVE-2023-5363
-# Adding a timestamp to force rebuild: 2025-05-16 14:42:00
+# Adding a timestamp to force rebuild: 2025-05-22 08:44:56
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends openssl && \
     apt-get clean && \

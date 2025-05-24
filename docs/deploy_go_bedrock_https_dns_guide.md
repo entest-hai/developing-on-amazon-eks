@@ -1,3 +1,9 @@
+<!-- IMPORTANT: This document contains placeholder values that need to be replaced with actual values before use:
+- YOUR_ACCOUNT_ID: Replace with your AWS account ID
+- YOUR_CERTIFICATE_ID: Replace with your ACM certificate ID
+- YOUR_OIDC_ID: Replace with your EKS OIDC provider ID
+-->
+
 # Step-by-Step Guide to Configure DNS Manually in Route 53 (Cross-Account)
 
 If your domain is registered in a different AWS account than where your EKS cluster is running, you'll need to follow these steps to configure DNS manually.

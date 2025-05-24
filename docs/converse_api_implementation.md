@@ -1,3 +1,9 @@
+<!-- IMPORTANT: This document contains placeholder values that need to be replaced with actual values before use:
+- YOUR_ACCOUNT_ID: Replace with your AWS account ID
+- YOUR_CERTIFICATE_ID: Replace with your ACM certificate ID
+- YOUR_OIDC_ID: Replace with your EKS OIDC provider ID
+-->
+
 # Implementing Bedrock Converse API for Claude 3 Haiku
 
 This document details the implementation of the Bedrock Converse API for the Claude 3 Haiku model in our go-bedrock-app application.

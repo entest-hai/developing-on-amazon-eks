@@ -1,3 +1,9 @@
+<!-- IMPORTANT: This document contains placeholder values that need to be replaced with actual values before use:
+- YOUR_ACCOUNT_ID: Replace with your AWS account ID
+- YOUR_CERTIFICATE_ID: Replace with your ACM certificate ID
+- YOUR_OIDC_ID: Replace with your EKS OIDC provider ID
+-->
+
 # Understanding HTTPS Termination with Network Load Balancers
 
 When using HTTPS with a Network Load Balancer (NLB) for your EKS application, it's important to understand where SSL/TLS termination occurs and how the traffic flows.

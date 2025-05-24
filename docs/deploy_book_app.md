@@ -1,3 +1,9 @@
+<!-- IMPORTANT: This document contains placeholder values that need to be replaced with actual values before use:
+- YOUR_ACCOUNT_ID: Replace with your AWS account ID
+- YOUR_CERTIFICATE_ID: Replace with your ACM certificate ID
+- YOUR_OIDC_ID: Replace with your EKS OIDC provider ID
+-->
+
 # Deploying the Go Book Application to Kubernetes
 
 This document provides detailed instructions on how to deploy the Go Book application to a Kubernetes cluster (EKS) and expose it using an AWS Load Balancer.

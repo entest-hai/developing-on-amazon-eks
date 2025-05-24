@@ -1,3 +1,9 @@
+<!-- IMPORTANT: This document contains placeholder values that need to be replaced with actual values before use:
+- YOUR_ACCOUNT_ID: Replace with your AWS account ID
+- YOUR_CERTIFICATE_ID: Replace with your ACM certificate ID
+- YOUR_OIDC_ID: Replace with your EKS OIDC provider ID
+-->
+
 # CloudWatch Logs Insights Queries for EKS Applications
 
 This document provides detailed step-by-step instructions for querying logs for applications running on EKS using both CloudWatch Log Groups and CloudWatch Logs Insights.

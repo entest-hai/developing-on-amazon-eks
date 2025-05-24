@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-bedrock-app
+  labels:
+    app: go-bedrock-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: go-bedrock-app
+  template:
+    metadata:
+      labels:
+        app: go-bedrock-app
+    spec:
+      serviceAccountName: bedrock-service-account
+      containers:
+      - name: go-bedrock-app
+        image: <ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/go-bedrock-app:v6
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        env:
+        - name: AWS_REGION
+          value: "<REGION>"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-bedrock-service
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "external"
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:<REGION>:<ACCOUNT_ID>:certificate/<CERTIFICATE_ID>"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-subnets: "<SUBNET_ID_1>,<SUBNET_ID_2>,<SUBNET_ID_3>"
+    external-dns.alpha.kubernetes.io/hostname: "<YOUR_DOMAIN>"
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3000
+    protocol: TCP
+  - name: https
+    port: 443
+    targetPort: 3000
+    protocol: TCP
+  type: LoadBalancer
+  selector:
+    app: go-bedrock-app

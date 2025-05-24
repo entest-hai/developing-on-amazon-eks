@@ -1,3 +1,9 @@
+<!-- IMPORTANT: This document contains placeholder values that need to be replaced with actual values before use:
+- YOUR_ACCOUNT_ID: Replace with your AWS account ID
+- YOUR_CERTIFICATE_ID: Replace with your ACM certificate ID
+- YOUR_OIDC_ID: Replace with your EKS OIDC provider ID
+-->
+
 # Deploying Go Bedrock Application to Amazon EKS
 
 This document provides detailed instructions for deploying the Go Bedrock application to Amazon EKS with the necessary IAM permissions to access Amazon Bedrock foundational models.
@@ -180,13 +186,13 @@ Create a file named `trust-relationship.json`:
     {
       "Effect": "Allow",
       "Principal": {
-        "Federated": "arn:aws:iam::${ACCOUNT_ID}:oidc-provider/${OIDC_PROVIDER}"
+        "Federated": "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/<OIDC_PROVIDER>"
       },
       "Action": "sts:AssumeRoleWithWebIdentity",
       "Condition": {
         "StringEquals": {
-          "${OIDC_PROVIDER}:sub": "system:serviceaccount:default:go-bedrock-service-account",
-          "${OIDC_PROVIDER}:aud": "sts.amazonaws.com"
+          "<OIDC_PROVIDER>:sub": "system:serviceaccount:default:go-bedrock-service-account",
+          "<OIDC_PROVIDER>:aud": "sts.amazonaws.com"
         }
       }
     }
@@ -198,8 +204,8 @@ Create the IAM role:
 
 ```bash
 # Replace variables in the trust relationship document
-sed -i "s/\${ACCOUNT_ID}/$ACCOUNT_ID/g" trust-relationship.json
-sed -i "s/\${OIDC_PROVIDER}/$OIDC_PROVIDER/g" trust-relationship.json
+sed -i "s/<ACCOUNT_ID>/$ACCOUNT_ID/g" trust-relationship.json
+sed -i "s/<OIDC_PROVIDER>/$OIDC_PROVIDER/g" trust-relationship.json
 
 # Create the IAM role
 aws iam create-role \
@@ -209,7 +215,7 @@ aws iam create-role \
 # Attach the policy to the role
 aws iam attach-role-policy \
   --role-name go-bedrock-app-role \
-  --policy-arn arn:aws:iam::${ACCOUNT_ID}:policy/BedrockAccessPolicy
+  --policy-arn arn:aws:iam::<ACCOUNT_ID>:policy/BedrockAccessPolicy
 ```
 
 #### 4. Create the Kubernetes Service Account
@@ -223,14 +229,14 @@ metadata:
   name: go-bedrock-service-account
   namespace: default
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/go-bedrock-app-role
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/go-bedrock-app-role
 ```
 
 Apply the service account:
 
 ```bash
 # Replace the account ID in the service account YAML
-sed -i "s/\${ACCOUNT_ID}/$ACCOUNT_ID/g" service-account.yaml
+sed -i "s/<ACCOUNT_ID>/$ACCOUNT_ID/g" service-account.yaml
 
 # Create the service account
 kubectl apply -f service-account.yaml
@@ -268,7 +274,7 @@ spec:
       serviceAccountName: go-bedrock-service-account  # This links the pod to the service account
       containers:
       - name: go-bedrock-app
-        image: your-account-id.dkr.ecr.your-region.amazonaws.com/go-bedrock-app:v4
+        image: <ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/go-bedrock-app:v4
         ports:
         - containerPort: 3000
           name: http
@@ -293,7 +299,7 @@ spec:
           periodSeconds: 10
         env:
         - name: AWS_REGION
-          value: "your-region"
+          value: "<REGION>"
 ```
 
 ### Service Manifest
@@ -431,7 +437,7 @@ To verify that the pods can access Amazon Bedrock:
    
    Look for the annotation:
    ```
-   eks.amazonaws.com/role-arn: arn:aws:iam::your-account-id:role/go-bedrock-app-role
+   eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/go-bedrock-app-role
    ```
 
 2. Check the pod's environment variables:
@@ -441,7 +447,7 @@ To verify that the pods can access Amazon Bedrock:
    
    You should see environment variables like:
    ```
-   AWS_ROLE_ARN=arn:aws:iam::your-account-id:role/go-bedrock-app-role
+   AWS_ROLE_ARN=arn:aws:iam::<ACCOUNT_ID>:role/go-bedrock-app-role
    AWS_WEB_IDENTITY_TOKEN_FILE=/var/run/secrets/eks.amazonaws.com/serviceaccount/token
    ```
 
@@ -455,7 +461,7 @@ kubectl get service go-bedrock-service -o jsonpath='{.status.loadBalancer.ingres
 
 Example URL:
 ```
-http://k8s-default-gobedroc-xxxxxxxx.your-region.elb.amazonaws.com
+http://k8s-default-gobedroc-xxxxxxxx.<REGION>.elb.amazonaws.com
 ```
 
 ## Verifying AWS Credentials Inside the Pod
@@ -500,7 +506,7 @@ env | grep AWS
 
 Example output:
 ```
-AWS_ROLE_ARN=arn:aws:iam::your-account-id:role/go-bedrock-app-role
+AWS_ROLE_ARN=arn:aws:iam::<ACCOUNT_ID>:role/go-bedrock-app-role
 AWS_WEB_IDENTITY_TOKEN_FILE=/var/run/secrets/eks.amazonaws.com/serviceaccount/token
 ```
 
@@ -518,8 +524,8 @@ Example output:
 ```json
 {
     "UserId": "AROA1EXAMPLE:botocore-session-1234567890",
-    "Account": "your-account-id",
-    "Arn": "arn:aws:sts::your-account-id:assumed-role/go-bedrock-app-role/botocore-session-1234567890"
+    "Account": "<ACCOUNT_ID>",
+    "Arn": "arn:aws:sts::<ACCOUNT_ID>:assumed-role/go-bedrock-app-role/botocore-session-1234567890"
 }
 ```
 
@@ -544,7 +550,7 @@ To verify that the pod has the correct permissions to access Amazon Bedrock, you
 
 ```bash
 # If AWS CLI is available and configured for Bedrock
-aws bedrock list-foundation-models --region us-west-2
+aws bedrock list-foundation-models --region <REGION>
 ```
 
 Or using Python:
@@ -553,7 +559,7 @@ Or using Python:
 import boto3
 import json
 
-bedrock_client = boto3.client('bedrock', region_name='us-west-2')
+bedrock_client = boto3.client('bedrock', region_name='<REGION>')
 models = bedrock_client.list_foundation_models()
 print(json.dumps(models, default=str))
 ```
